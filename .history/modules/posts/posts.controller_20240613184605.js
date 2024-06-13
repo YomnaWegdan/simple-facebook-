@@ -1,0 +1,75 @@
+import postModel from '../../database/models/posts.models.js'
+
+
+const addPost = async (req , res)=>{
+    const result = await postModel.create(req.body)
+    res.status(200).json({message:'success' , result})
+}
+
+const getAllPosts = async (req , res)=>{
+    const result = await postModel.findAll()
+    res.status(200).json({message:'success' , result})
+}
+
+// const getPostById = async (req , res)=>{
+//     const result = await postModel.findByPk(req.params.post_id ,{
+//         attributes:{exclude:'id'}
+//     }
+        
+//     )
+//     res.status(200).json({message:'success' , result})
+    
+// }
+
+const getPostById = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const result = await postModel.findByPk(postId, {
+            attributes: { exclude: 'id' }
+        });
+        if (!result) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        res.status(200).json({ message: 'success', result });
+    } catch (error) {
+        res.status(500).json({ message: 'error', error: error.message });
+    }
+};
+
+const getUserPosts = async (req , res)=>{
+const userWithPosts = await User.findByPk(req.params.id, {
+  include: [{ model: Post,attributes: ['id', 'title', 'description']}],
+  attributes: ['id', 'name'],
+});
+
+if (!userWithPosts) {
+  return res.status(404).json({ message: 'User not found' });
+}
+res.status(200).json({ message: 'Success', posts: userWithPosts.Posts });
+}
+
+
+
+const updatePost = async (req , res)=>{
+    const result = await postModel.update(req.body ,{
+        where:{id:req.params.post_id}
+       
+    })
+    res.status(200).json({message:'success' , result})
+}
+
+const deletePost = async (req , res)=>{
+    const result = await postModel.destroy({
+        where:{id:req.params.post_id}
+       
+    })
+    res.status(200).json({message:'success' , result})
+}
+    export{
+        addPost,
+        getAllPosts,
+        getPostById,
+        getUserPosts,
+        updatePost,
+        deletePost
+    }
